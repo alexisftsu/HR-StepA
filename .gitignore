@@ -1,0 +1,23 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+
+# Datos locales y scratch
+data/**
+!data/.gitkeep
+
+# CSV generados (conserva solo el release)
+*.csv
+!results/HR_v1/*.csv
+
+# Backups de parcheo
+*.bak*
+*_bak*
+*_bak*/ 
+
+# Artefactos y zips
+results/HR_v1.zip
+
+# SO
+.DS_Store
+Thumbs.db
