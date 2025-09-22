@@ -1,0 +1,9 @@
+﻿{
+  "policy": "E",
+  "b1": 300,
+  "b2": 3000,
+  "Tmin_low": 2000,
+  "T_mid": 3000,
+  "T_high": 5000,
+  "zeros_base": "canonical_idxgamma_T10000.txt"
+}
