@@ -1,0 +1,57 @@
+{
+  "stepA": {
+    "zeros": {
+      "count": 171936,
+      "gamma_min": 10.0,
+      "gamma_max": 74920.827498994,
+      "S1": 16.874955065126056,
+      "C0_prime_upper": 35.12300802841684,
+      "T0": 74920.827498994,
+      "X0": 5613130393.134015
+    },
+    "kernel": {
+      "Cw_sup_h2": 5.995500610621828,
+      "T_min": 1.4142135623730951,
+      "I_tail": 2.6963823113396845,
+      "K_eff": 10.0,
+      "K_max_measured": null,
+      "C_R": 18.11374656954173
+    },
+    "VK": {
+      "R": 55.241,
+      "t0": 10.0,
+      "BVK": 150.0,
+      "beta_VK": 0.0037132734965429678,
+      "x1": 9e+24
+    },
+    "constants": {
+      "C_bajo": 53.31633206950451,
+      "C_alto": 132018922376.77501,
+      "C_empalme": 21878.260305565633,
+      "C_tot": 132018922376.77501
+    },
+    "constants_RH": {
+      "C_RH": 0.039788735772973836,
+      "C_small_check_upto": 1000,
+      "C_small": 1.9233607946440099,
+      "C_tot_RH": 1.9233607946440099
+    }
+  },
+  "partB_selberg": {
+    "beta": 0.1,
+    "Delta": 1000.0,
+    "N": 1000,
+    "majorant_ok": true,
+    "minorant_ok": true,
+    "min_gap_majorant": 0.0004780867030211855,
+    "min_gap_minorant": 0.000473705917759068,
+    "E_plus_theory": 0.0,
+    "E_minus_theory": 0.0,
+    "E_plus_grid": 0.41248510852657905,
+    "E_minus_grid": 0.41297720650860537,
+    "npz": "out\\BS_coeffs_beta0.1_D1000.npz",
+    "csv": "out\\BS_coeffs_beta0.1_D1000.csv",
+    "certificate": "out\\BS_certificate_beta0.1_D1000.txt"
+  },
+  "generated_at": "2025-09-24T21:10:13"
+}
