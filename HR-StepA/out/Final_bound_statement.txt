@@ -24,17 +24,17 @@ Conclusion (RH): for all x >= 2,
   |psi(x) - x| <= C_tot_RH * sqrt(x) * (log x)^2.
 
 === BeurlingSelberg (Part B, Selberg circle, enforced) ===
-beta = 0.1,  Delta = 1000.0,  N = 1000
+beta = 0.12,  Delta = 1100.0,  N = 1100
 majorant_ok = True,  minorant_ok = True
-min_gap_majorant = 0.000478086703021,  min_gap_minorant = 0.000473705917759
-L1 theory = 1/(N+1) = 9.990010e-04
-L1 (grid, after enforcement): E_plus = 0.412485108527, E_minus = 0.412977206509
+min_gap_majorant = 0.000155638802847,  min_gap_minorant = 0.000152737237802
+L1 theory = 1/(N+1) = 9.082652e-04
+L1 (grid, after enforcement): E_plus = 0.377908885669, E_minus = 0.378407127958
 
 Fourier support: |n|<=N (Fejr window). The enforced pair remains band-limited and
 pointwise majorant/minorant on a dense grid; L1 increases slightly vs theory, which is acceptable for explicit bounds.
 
 === Files ===
 - Step A results : D:\lmfdb-zeros\HR-StepA\out\StepA_results.json
-- BS coeffs (npz): out\BS_coeffs_beta0.1_D1000.npz
-- BS coeffs (csv): out\BS_coeffs_beta0.1_D1000.csv
-- BS certificate : out\BS_certificate_beta0.1_D1000.txt
+- BS coeffs (npz): out\BS_coeffs_beta0.12_D1100.npz
+- BS coeffs (csv): out\BS_coeffs_beta0.12_D1100.csv
+- BS certificate : out\BS_certificate_beta0.12_D1100.txt

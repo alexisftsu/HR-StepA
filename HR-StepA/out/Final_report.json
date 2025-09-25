@@ -38,20 +38,20 @@
     }
   },
   "partB_selberg": {
-    "beta": 0.1,
-    "Delta": 1000.0,
-    "N": 1000,
+    "beta": 0.12,
+    "Delta": 1100.0,
+    "N": 1100,
     "majorant_ok": true,
     "minorant_ok": true,
-    "min_gap_majorant": 0.0004780867030211855,
-    "min_gap_minorant": 0.000473705917759068,
+    "min_gap_majorant": 0.00015563880284719112,
+    "min_gap_minorant": 0.00015273723780168634,
     "E_plus_theory": 0.0,
     "E_minus_theory": 0.0,
-    "E_plus_grid": 0.41248510852657905,
-    "E_minus_grid": 0.41297720650860537,
-    "npz": "out\\BS_coeffs_beta0.1_D1000.npz",
-    "csv": "out\\BS_coeffs_beta0.1_D1000.csv",
-    "certificate": "out\\BS_certificate_beta0.1_D1000.txt"
+    "E_plus_grid": 0.37790888566876457,
+    "E_minus_grid": 0.37840712795750314,
+    "npz": "out\\BS_coeffs_beta0.12_D1100.npz",
+    "csv": "out\\BS_coeffs_beta0.12_D1100.csv",
+    "certificate": "out\\BS_certificate_beta0.12_D1100.txt"
   },
-  "generated_at": "2025-09-24T21:10:13"
+  "generated_at": "2025-09-24T22:46:56"
 }
