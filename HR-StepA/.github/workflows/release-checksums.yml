@@ -1,0 +1,70 @@
+﻿name: release-checksums
+
+on:
+  release:
+    types: [published, edited]
+
+jobs:
+  build-sums:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (tag del release) con LFS
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          lfs: true
+
+      - name: Generar SHA256SUMS.txt
+        run: |
+          set -e
+          ls -la
+          test -f out/BEST_manifest.json || { echo "No existe out/BEST_manifest.json"; exit 1; }
+
+          # Extrae rutas principales desde el manifest
+          ASSETS_FROM_MANIFEST=$(jq -r '.assets.best_zip, .assets.inputs_zip, .assets.lemma_pdf' out/BEST_manifest.json)
+
+          # Otras rutas conocidas
+          EXTRAS="out/BEST_summary.txt"
+          CSV_GLOB="out/summary_sweep_beta*.csv"
+
+          : > out/SHA256SUMS.txt
+          for f in ${ASSETS_FROM_MANIFEST} ${EXTRAS}; do
+            if [ -f "$f" ]; then
+              sha256sum "$f" >> out/SHA256SUMS.txt
+            else
+              echo "WARN: falta $f" >&2
+            fi
+          done
+
+          # CSVs (si existen)
+          for f in $CSV_GLOB; do
+            [ -f "$f" ] && sha256sum "$f" >> out/SHA256SUMS.txt || true
+          done
+
+          echo "==== SHA256SUMS.txt ===="
+          cat out/SHA256SUMS.txt
+
+      - name: Subir SHA256SUMS.txt al release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  verify-on-windows:
+    runs-on: windows-latest
+    needs: build-sums
+    steps:
+      - name: Checkout (tag del release) con LFS
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          lfs: true
+
+      - name: Verificar checksums con tu script
+        shell: pwsh
+        run: |
+          if (-not (Test-Path .\verify_release.ps1)) {
+            Write-Error "Falta verify_release.ps1"; exit 1
+          }
+          .\verify_release.ps1
