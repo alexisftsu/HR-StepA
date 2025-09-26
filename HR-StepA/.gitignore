@@ -1,0 +1,24 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# LaTeX
+*.aux
+*.log
+*.toc
+*.out
+*.synctex.gz
+
+# Artefactos num?ricos/plots
+*.npz
+out/*.png
+
+# ZIPs grandes (mant?n solo los del release)
+out/HR_Final_pkg_*.zip
+!out/HR_Final_pkg_FINAL_BEST_beta*.zip
+!out/HR_Final_inputs_beta*.zip
+
+# OS/Editor
+.DS_Store
+Thumbs.db
