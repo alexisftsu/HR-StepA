@@ -15,5 +15,6 @@
                    "inputs_zip_sha256":  "81712D9D577B4E04DEEBA4C6D7FC4897B1FE073615F26D286100E489FD6BD76B",
                    "lemma_pdf":  "lemma_bs_insertion_filled.pdf",
                    "checksums":  "out/SHA256SUMS.txt"
-               }
+               },
+    "commit":  "3b0c2adbea8243bad46d9ddd557b22fd12114df0"
 }
