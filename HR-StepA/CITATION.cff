@@ -1,0 +1,12 @@
+﻿cff-version: 1.2.0
+message: If you use this repository, please cite it.
+title: HR-StepA – Part B artifacts (BEST β=0.08, Δ=1100)
+authors:
+  - name: alexisftsu
+version: HR-StepA-PartB-beta0.08-Delta1100
+date-released: 2025-09-25
+repository-code: https://github.com/alexisftsu/HR-StepA
+keywords:
+  - Riemann Hypothesis
+  - Selberg circle method
+  - Beurling–Selberg
