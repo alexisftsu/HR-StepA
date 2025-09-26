@@ -1,0 +1,19 @@
+﻿{
+    "tag":  "HR-StepA-PartB-beta0.08-Delta1100",
+    "beta":  0.08,
+    "Delta":  1100,
+    "C_BS":  0.374358,
+    "E_theory":  0.00090826521344232513,
+    "gaps":  {
+                 "minorant":  0.0001517,
+                 "majorant":  0.0001567
+             },
+    "assets":  {
+                   "inputs_zip":  "out/HR_Final_inputs_beta0.08_D1100.zip",
+                   "best_zip":  "out/HR_Final_pkg_FINAL_BEST_beta0.08_D1100.zip",
+                   "best_zip_sha256":  "90257E1748FFBCD054EC75A9B3618CD134D8D0FECE37E9EBB17C9CB45A5691CA",
+                   "inputs_zip_sha256":  "81712D9D577B4E04DEEBA4C6D7FC4897B1FE073615F26D286100E489FD6BD76B",
+                   "lemma_pdf":  "lemma_bs_insertion_filled.pdf",
+                   "checksums":  "out/SHA256SUMS.txt"
+               }
+}
