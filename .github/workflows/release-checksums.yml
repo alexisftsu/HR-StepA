@@ -60,16 +60,17 @@ jobs:
           CSV_GLOB="summary_sweep_beta*.csv"
           : > SHA256SUMS.txt
           for f in ${ASSETS_FROM_MANIFEST} ${EXTRAS}; do
-            if [ -f "$f" ]; then
-              sha256sum "$f" >> SHA256SUMS.txt
-            else
-              echo "WARN: falta $f" >&2
-            fi
-          done
+  f2=${f#out/}
+  if [ -f "$f2" ]; then
+    sha256sum "$f2" >> SHA256SUMS.txt
+  else
+    echo "WARN: falta $f2" >&2
+  fi
+done
           for f in $CSV_GLOB; do
             [ -f "$f" ] && sha256sum "$f" >> SHA256SUMS.txt || true
           done
-          cat out/SHA256SUMS.txt
+          cat SHA256SUMS.txt
 
       - id: mark
         if: ${{ steps.detect.outputs.count != '0' }}
@@ -120,6 +121,7 @@ jobs:
         working-directory: HR-StepA
         shell: pwsh
         run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
+
 
 
 
