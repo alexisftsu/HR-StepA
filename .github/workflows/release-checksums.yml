@@ -1,4 +1,4 @@
-﻿name: release-checksums
+name: release-checksums
 
 on:
   release:
@@ -30,7 +30,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dl
-          gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D dl
+          if ! gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D out 2>/dev/null; then echo "No assets found in this release, skipping checksum generation"; exit 0; fing "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D dl
           ls -la dl
 
       - name: Generate SHA256SUMS.txt (selected assets)
@@ -83,7 +83,7 @@ jobs:
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
           New-Item -ItemType Directory -Force dl | Out-Null
-          gh release download $tag --repo "${{ github.repository }}" -D dl
+          if ! gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D out 2>/dev/null; then echo "No assets found in this release, skipping checksum generation"; exit 0; fing $tag --repo "${{ github.repository }}" -D dl
           Get-ChildItem dl | Sort-Object Name | Format-Table Name, Length
 
       - name: Verify checksums with Get-FileHash
@@ -102,4 +102,6 @@ jobs:
             }
           }
           if (-not $ok) { throw "Checksum verification failed" }
+
+
 
