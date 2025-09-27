@@ -1,0 +1,62 @@
+{
+  "generated_at_utc": "20250922T051726Z",
+  "zeros_inputs": {
+    "files_used": [
+      "odlyzko_zeros1.dat",
+      "odlyzko_zeros2.dat",
+      "riemann_zeros_final.txt",
+      "riemann_zeros_odlyzko.csv",
+      "riemann_zeros_odlyzko.dat",
+      "zeros_T10000.txt"
+    ],
+    "T0_target": 3000000000000.0,
+    "T0_effective": 3000000000000.0,
+    "gamma_min": 14.134725141735,
+    "gamma_max": 9.996851577763514e+69,
+    "count_used": 128081,
+    "S1_sum_1_over_|rho|": 8.024839968447353,
+    "C0_prime_upper": 16.70265298786034
+  },
+  "kernel_spec": {
+    "family": "Paley\u2013Wiener; hat_g\u03c3(t)=(1/\u03c3)*(1-|t|/\u03c3)^3_+",
+    "fourier": "hat_g(t)=\u222bg(u)e^{-i t u}du; g(u)=(1/2\u03c0)\u222bhat_g(t)e^{i t u}dt",
+    "sigma": 1.0,
+    "scaling_alpha": 5.62187964951577,
+    "||g'||_L1_before": 0.17787645099911256,
+    "||g'||_L1_after": 1.0,
+    "cert_data": {
+      "sigma": 1.0,
+      "grid_u": 600,
+      "U_cut": 100.0,
+      "I0U_estimate": 0.07939608991464688,
+      "sup_h2": 5.995500610621828,
+      "BV_h1": 2.9992500000008553,
+      "tail_bound": 0.019084271169818815,
+      "L1_gprime_unscaled": 0.17787645099911256,
+      "scale_alpha": 5.62187964951577,
+      "norm_after_scaling": 1.0
+    }
+  },
+  "VK_constants": {
+    "R_VK": 55.241,
+    "B_VK": 150.0,
+    "b_VK": 0.0037132734965429678,
+    "x1": 1000000.0,
+    "status": "provisional-conservative"
+  },
+  "constants": {
+    "C_R_kernel": 0.0,
+    "C_bajo": 16.78223045940629,
+    "X0": 9e+24,
+    "F_X0": 132018922376.77501,
+    "C_alto": 2.7388513066024716e+31,
+    "C_empalme": 132018922376.77501,
+    "epsilon": 1e-12,
+    "C_tot": 2.7388513066024716e+31
+  },
+  "notes": {
+    "C_bajo_status": "provisional; C_R_kernel set to 0.0 pending certified remainder",
+    "VK_status": "derived conservatively from R_VK, not fully certified",
+    "closure": "This closes Step A numerically with conservative placeholders. Replace C_R_kernel and VK with certified values to finalize."
+  }
+}

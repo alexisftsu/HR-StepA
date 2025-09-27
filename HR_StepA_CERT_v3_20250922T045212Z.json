@@ -1,0 +1,40 @@
+{
+  "generated_at_utc": "20250922T045212Z",
+  "T0": 3000000000000.0,
+  "X0": 9e+24,
+  "VK_region_constant": 55.241,
+  "VK_constants": {
+    "B_VK": 125.0,
+    "b_VK": 0.004455928195851561,
+    "x1": 1000000.0,
+    "suggested": true
+  },
+  "zeros": {
+    "file": null,
+    "count_loaded": null,
+    "C0_prime_upper": null,
+    "notes": "No zeros file provided or path does not exist."
+  },
+  "kernel": {
+    "C_R": null,
+    "notes": "C_R is not provided. You must supply a certified C_R from your kernel analysis."
+  },
+  "constants": {
+    "C_bajo": null,
+    "F_X0": 109315992791.25803,
+    "C_alto": 2.257229062482426e+31,
+    "C_empalme": null,
+    "epsilon": 1e-12,
+    "C_tot": null
+  },
+  "grid_info": {
+    "r": 1.05,
+    "steps_used": 2000,
+    "X_at_max": 2.151991984152374e+67,
+    "sampled_points": 2001
+  },
+  "warnings": {
+    "vk": "Using non-certified VK suggestion. Provide vk_constants_json for certification.",
+    "bajo": "C_bajo cannot be certified yet (need both C0' and C_R)."
+  }
+}

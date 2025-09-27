@@ -1,0 +1,43 @@
+{
+  "generated_at_utc": "20250922T052921Z",
+  "verification": {
+    "T_min": 1.4142135623730951,
+    "T_scan": 10000.0,
+    "N_grid": 160,
+    "N_eval": 160,
+    "delta_zero_mask": 0.0001,
+    "mpmath_dps": 60,
+    "K_stats": {
+      "K_max": 11.713755587187803,
+      "K_95%": 0.6705760463665096,
+      "K_median": 0.0861242560120761
+    },
+    "safety_factor": 2.5,
+    "K_eff": 29.28438896796951,
+    "method": "central-difference of log zeta along t; excludes \u00b1delta around zeros"
+  },
+  "kernel_weight": {
+    "Cw_sup_h2": 5.995500610621828
+  },
+  "tail_integral": {
+    "I_tail": 2.6963823113396845
+  },
+  "C_R_kernel": 53.1984603124063,
+  "zeros_S1_and_C0p": {
+    "S1": 8.024839968447353,
+    "C0_prime_upper": 16.70265298786034
+  },
+  "VK_constants_used": {
+    "B_VK": 150.0,
+    "b_VK": 0.01
+  },
+  "constants": {
+    "C_bajo": 69.98069077181259,
+    "X0": 9e+24,
+    "F_X0": 125076900536.31819,
+    "C_alto": 1.5231069467087493e+23,
+    "C_empalme": 125076900536.31819,
+    "C_tot": 1.5231069467087493e+23,
+    "epsilon": 1e-12
+  }
+}
