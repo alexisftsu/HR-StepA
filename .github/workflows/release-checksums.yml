@@ -53,23 +53,38 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
+          # Descarga todos los assets del release al directorio actual (HR-StepA)
           gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D .
+          ls -la . || true
+
+          # Manifest en raíz
           test -f BEST_manifest.json || { echo "No existe BEST_manifest.json"; exit 1; }
+
+          # Rutas desde el manifest (pueden venir con prefijo out/)
           ASSETS_FROM_MANIFEST=$(jq -r '.assets.best_zip, .assets.inputs_zip, .assets.lemma_pdf' BEST_manifest.json)
+
+          # Extras en raíz
           EXTRAS="BEST_summary.txt"
           CSV_GLOB="summary_sweep_beta*.csv"
+
+          # Salida en raíz
           : > SHA256SUMS.txt
+
+          # Hashear assets del manifest (pelando 'out/' si aparece)
           for f in ${ASSETS_FROM_MANIFEST} ${EXTRAS}; do
-  f2=${f#out/}
-  if [ -f "$f2" ]; then
-    sha256sum "$f2" >> SHA256SUMS.txt
-  else
-    echo "WARN: falta $f2" >&2
-  fi
-done
+            f2=${f#out/}
+            if [ -f "$f2" ]; then
+              sha256sum "$f2" >> SHA256SUMS.txt
+            else
+              echo "WARN: falta $f2" >&2
+            fi
+          done
+
+          # Hashear CSV opcionales
           for f in $CSV_GLOB; do
             [ -f "$f" ] && sha256sum "$f" >> SHA256SUMS.txt || true
           done
+
           cat SHA256SUMS.txt
 
       - id: mark
@@ -121,7 +136,3 @@ done
         working-directory: HR-StepA
         shell: pwsh
         run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
-
-
-
-
