@@ -128,7 +128,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
-          gh release download $tag --repo "${{ github.repository }}" -p SHA256SUMS.txt -D .
+          gh release download $tag --repo "${{ github.repository }}" --skip-existing -p SHA256SUMS.txt -D .
           Get-ChildItem .
 
       - name: Verificar checksums (PowerShell)
@@ -139,7 +139,7 @@ jobs:
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
           # Asegura que los archivos a verificar estén presentes en HR-StepA\
-          gh release download $tag --repo "${{ github.repository }}" -D .
+          gh release download $tag --repo "${{ github.repository }}" --skip-existing -D .
           $sumsPath = Join-Path (Get-Location) 'SHA256SUMS.txt'
           if (!(Test-Path $sumsPath)) { Write-Error "No se encontró $sumsPath"; exit 1 }
 
@@ -156,4 +156,5 @@ jobs:
             $got = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLower()
             if ($got -ne $expected) { Write-Host "MISMATCH $file"; $errors++ } else { Write-Host "OK $file" }
           }
-          if ($errors -gt 0) { Write-Error "Hubo $errors errores de checksum"; exit 1 }
+          if ($errors -gt 0) { Write-Error "Hubo $errors errores de checksum"; exit 1 }; exit 0
+
