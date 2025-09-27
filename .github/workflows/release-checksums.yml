@@ -129,8 +129,31 @@ jobs:
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
           gh release download $tag --repo "${{ github.repository }}" -p SHA256SUMS.txt -D .
-          Get-ChildItem .      - name: Verificar checksums con tu script
+          Get-ChildItem .
+
+      - name: Verificar checksums (PowerShell)
         working-directory: HR-StepA
         shell: pwsh
-        run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ steps.settag.outputs.tag }}"
+          # Asegura que los archivos a verificar estén presentes en HR-StepA\
+          gh release download $tag --repo "${{ github.repository }}" -D .
+          $sumsPath = Join-Path (Get-Location) 'SHA256SUMS.txt'
+          if (!(Test-Path $sumsPath)) { Write-Error "No se encontró $sumsPath"; exit 1 }
 
+          $lines  = Get-Content $sumsPath | Where-Object { $_ -match '\S' }
+          $errors = 0
+          foreach ($line in $lines) {
+            # Formato: "<hash><2+ espacios><archivo>"
+            $parts = $line -split '\s{2,}', 2
+            if ($parts.Count -lt 2) { Write-Host "Saltando línea: $line"; continue }
+            $expected = $parts[0].ToLower()
+            $file     = $parts[1]
+
+            if (!(Test-Path $file)) { Write-Host "MISSING  $file"; $errors++; continue }
+            $got = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLower()
+            if ($got -ne $expected) { Write-Host "MISMATCH $file"; $errors++ } else { Write-Host "OK $file" }
+          }
+          if ($errors -gt 0) { Write-Error "Hubo $errors errores de checksum"; exit 1 }
