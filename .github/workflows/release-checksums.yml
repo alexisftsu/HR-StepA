@@ -79,7 +79,7 @@ jobs:
         if: ${{ steps.detect.outputs.count != '0' }}
         uses: softprops/action-gh-release@v2
         with:
-          files: SHA256SUMS.txt
+          files: HR-StepA/SHA256SUMS.txt
           tag_name: ${{ steps.settag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -120,5 +120,6 @@ jobs:
         working-directory: HR-StepA
         shell: pwsh
         run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
+
 
 
