@@ -128,11 +128,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
-          New-Item -ItemType Directory -Force out | Out-Null
-          gh release download $tag --repo "${{ github.repository }}" -p SHA256SUMS.txt -D out
-          Get-ChildItem out
-
-      - name: Verificar checksums con tu script
+          gh release download $tag --repo "${{ github.repository }}" -p SHA256SUMS.txt -D .
+          Get-ChildItem .      - name: Verificar checksums con tu script
         working-directory: HR-StepA
         shell: pwsh
         run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
+
