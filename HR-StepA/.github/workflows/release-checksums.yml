@@ -1,5 +1,4 @@
-﻿# Updated again: 09/26/2025 21:29:16
-name: release-checksums
+﻿name: release-checksums
 
 on:
   release:
