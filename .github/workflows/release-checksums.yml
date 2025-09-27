@@ -56,8 +56,8 @@ jobs:
           gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D .
           test -f out/BEST_manifest.json || { echo "No existe out/BEST_manifest.json"; exit 1; }
           ASSETS_FROM_MANIFEST=$(jq -r '.assets.best_zip, .assets.inputs_zip, .assets.lemma_pdf' out/BEST_manifest.json)
-          EXTRAS="out/BEST_summary.txt"
-          CSV_GLOB="out/summary_sweep_beta*.csv"
+          EXTRAS="BEST_summary.txt"
+          CSV_GLOB="summary_sweep_beta*.csv"
           : > out/SHA256SUMS.txt
           for f in ${ASSETS_FROM_MANIFEST} ${EXTRAS}; do
             if [ -f "$f" ]; then
@@ -120,3 +120,4 @@ jobs:
         working-directory: HR-StepA
         shell: pwsh
         run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
+
