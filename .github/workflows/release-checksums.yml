@@ -54,7 +54,7 @@ jobs:
         run: |
           set -e
           # Descarga todos los assets del release al directorio actual (HR-StepA)
-          gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D .
+          gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" --skip-existing -D .
           ls -la . || true
 
           # Manifest en raíz
@@ -157,4 +157,5 @@ jobs:
             if ($got -ne $expected) { Write-Host "MISMATCH $file"; $errors++ } else { Write-Host "OK $file" }
           }
           if ($errors -gt 0) { Write-Error "Hubo $errors errores de checksum"; exit 1 }; exit 0
+
 
