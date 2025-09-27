@@ -1,0 +1,15 @@
+=== HR Step A ? Bound (unconditional, piecewise) ===
+
+Inputs:
+  T0 = 74920,827498994
+  X0 = 5613130393,134015
+  C_bajo = 47,68361383784675
+  VK: B = 12, beta = 0,18, x1 = 9,0000000000000004E+24
+
+For all x >= 2:
+  |psi(x) - x| <=
+    - C_bajo * sqrt(x) * (log x)^2,                for 2 <= x <= X0
+    - min{ C_bajo * sqrt(x) * (log x)^2,
+           B * x * exp(- beta * Lambda(x)) },      for X0 <= x < x1
+    - B * x * exp(- beta * Lambda(x)),             for x >= x1
+  where Lambda(x) = (log x)^(3/5) * (log log x)^(-1/5).

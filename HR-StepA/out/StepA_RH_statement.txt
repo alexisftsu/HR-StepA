@@ -1,0 +1,8 @@
+=== HR Step A  Uniform bound under RH ===
+
+C_RH = 1/(8*pi) = 0.039788735773
+Small-x check: 2 <= x <= 1000, C_small = 1.92336079464
+Uniform constant (all x>=2, under RH): C_tot_RH = 1.92336079464
+
+Conclusion (RH): for all x >= 2,
+  |psi(x) - x| <= C_tot_RH * sqrt(x) * (log x)^2.

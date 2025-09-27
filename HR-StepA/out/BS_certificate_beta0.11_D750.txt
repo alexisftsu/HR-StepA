@@ -1,0 +1,6 @@
+=== BeurlingSelberg (Selberg circle) certificate ===
+beta=0.11, Delta=750.0, N=750
+majorant_ok=True, minorant_ok=True
+min_gap_majorant=3.0205839358e-05, min_gap_minorant=3.51401853751e-05
+E_plus_theory=E_minus_theory=0
+E_plus_grid=0.547397133844, E_minus_grid=0.547989199006

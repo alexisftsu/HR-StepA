@@ -1,0 +1,25 @@
+{
+  "model": "Selberg-circle (from PW)",
+  "params": {
+    "beta": 0.1,
+    "Delta": 200.0,
+    "N": 200,
+    "gridN": 80001,
+    "force": true
+  },
+  "valid": {
+    "majorant_ok": true,
+    "minorant_ok": true,
+    "min_gap_majorant": 0.017041069543013876,
+    "min_gap_minorant": 0.00047648320047106313
+  },
+  "L1_errors": {
+    "E_plus": 588447001288913.9,
+    "E_minus": 1935986353262950.0,
+    "target_1_over_Delta": 0.005
+  },
+  "fourier": {
+    "n_min": -200,
+    "n_max": 200
+  }
+}

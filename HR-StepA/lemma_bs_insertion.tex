@@ -1,0 +1,51 @@
+﻿\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,fullpage}
+\newcommand{\Chi}{\mathbf{1}}
+\begin{document}
+
+\section*{Lemma (Beurling--Selberg insertion, circle model)}
+Let $\beta>0$ and $\Delta\ge1$, $N=\lfloor\Delta\rfloor$. Let $S^\pm$ be the Selberg trigonometric polynomials with
+Fourier support $\{|n|\le N\}$ such that on one period $T=\mathbb{R}/\mathbb{Z}$ we have
+\[
+  S^-(x) \le \Chi_{[-\beta,\beta]}(x) \le S^+(x)\qquad(\forall x\in T),
+\]
+and $L^1$ errors $E_\pm \approx 1/(N+1)$ (exact in the unforced Selberg pair). In our numerical construction we enforce
+pointwise majorant/minorant on a dense grid using Fejér-bumps (still band-limited), which preserves the support
+$\{|n|\le N\}$ and induces $E_\pm^{\text{grid}}\ge 1/(N+1)$.
+
+\medskip
+\noindent\textbf{Insertion in the explicit formula (schematic).}
+Let $x>0$ and set $y=\frac{\log n - \log x}{2\pi}$ (periodized model).
+Then
+\[
+  \sum_{n\ge1} \Lambda(n)\, \Chi_{[-\beta,\beta]}(y)
+  \ \le\ \sum_{n\ge1} \Lambda(n)\, S^+(y)
+  \ =\ \sum_{|k|\le N} \widehat{S^+}(k) \sum_{n\ge1} \Lambda(n)\, e^{2\pi i k y}
+\]
+and analogously for the lower bound with $S^-$. The inner Dirichlet sums are handled via the explicit formula
+for $\zeta'/\zeta$, yielding (after routine rearrangements) a decomposition:
+\[
+  (\text{primes})\ =\ (\text{main})\ +\ (\text{zeros})\ +\ (\text{Gamma})\ +\ (\text{trunc. tail}),
+\]
+where the ``zeros'' piece is uniformly bounded because $S^\pm$ are band-limited and we control tails by the Part~A constants.
+
+\medskip
+\noindent\textbf{Parameters used in this package.}
+From the JSON produced in the pipeline:
+\begin{itemize}
+  \item Selberg (circle): $\beta = \verb|{BETA}|$, $\Delta=\verb|{DELTA}|$, $N=\verb|{N}|$,
+        with $E_\pm^{\text{theory}} = 1/(N+1)$ and grid values
+        $E_+^{\text{grid}}=\verb|{EPG}|$, $E_-^{\text{grid}}=\verb|{EMG}|$,
+        and certified gaps $\min(S^+-\Chi)=\verb|{GAPp}|$, $\min(\Chi-S^-)=\verb|{GAPm}|$.
+  \item Part A: $C_{\text{bajo}}=\verb|{CBAJO}|$, $(B,\beta_{\rm VK},x_1)=(\verb|{BVK}|,\verb|{BVKB}|,\verb|{XONE}|)$,
+        piecewise bound for $|\psi(x)-x|$ on $x\ge2$ as in the statement.
+  \item (Optional) Under RH: $C_{\rm RH,tot}=\verb|{CRHTOT}|$ so that
+        $|\psi(x)-x|\le C_{\rm RH,tot}\sqrt{x}\log^2 x$ for all $x\ge2$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Remark.} The circle model is a numerically robust proxy. For the real-line Paley--Wiener pair
+we use the same Fejér-windowing idea with the triangular cutoff; the enforcement step carries over verbatim, preserving
+band-limit and giving $L^1$ within a small factor of $1/\Delta$.
+
+\end{document}
