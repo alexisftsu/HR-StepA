@@ -14,9 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    defaults:
-      run:
-        working-directory: HR-StepA
     steps:
       - id: settag
         name: Compute tag
@@ -37,6 +34,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Verificar y generar checksums si hay assets
+        working-directory: HR-StepA
         run: |
           set -e
           # Intentar descargar assets, continuar si no hay
@@ -78,9 +76,6 @@ jobs:
     runs-on: windows-latest
     needs: build-sums
     if: success()
-    defaults:
-      run:
-        working-directory: HR-StepA
     steps:
       - id: settag
         name: Compute tag
@@ -99,6 +94,7 @@ jobs:
           lfs: true
 
       - name: Descargar SHA256SUMS.txt del release
+        working-directory: HR-StepA
         shell: pwsh
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
@@ -108,5 +104,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verificar checksums con tu script
+        working-directory: HR-StepA
         shell: pwsh
         run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
