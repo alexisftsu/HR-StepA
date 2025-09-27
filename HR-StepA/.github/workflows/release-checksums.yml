@@ -3,30 +3,39 @@
 on:
   release:
     types: [published, edited]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to verify (e.g., HR-StepA-PartB-beta0.08-Delta1100)"
+        required: true
+
+env:
+  RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
 
 jobs:
   build-sums:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_TAG: ${{ env.RELEASE_TAG }}
     steps:
       - name: Checkout (tag del release) con LFS
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ env.RELEASE_TAG }}
           lfs: true
+
+      - name: Instalar jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Generar SHA256SUMS.txt
         run: |
           set -e
           ls -la
           test -f out/BEST_manifest.json || { echo "No existe out/BEST_manifest.json"; exit 1; }
-
-          # Extrae rutas principales desde el manifest
           ASSETS_FROM_MANIFEST=$(jq -r '.assets.best_zip, .assets.inputs_zip, .assets.lemma_pdf' out/BEST_manifest.json)
-
-          # Otras rutas conocidas
           EXTRAS="out/BEST_summary.txt"
           CSV_GLOB="out/summary_sweep_beta*.csv"
-
           : > out/SHA256SUMS.txt
           for f in ${ASSETS_FROM_MANIFEST} ${EXTRAS}; do
             if [ -f "$f" ]; then
@@ -35,12 +44,9 @@ jobs:
               echo "WARN: falta $f" >&2
             fi
           done
-
-          # CSVs (si existen)
           for f in $CSV_GLOB; do
             [ -f "$f" ] && sha256sum "$f" >> out/SHA256SUMS.txt || true
           done
-
           echo "==== SHA256SUMS.txt ===="
           cat out/SHA256SUMS.txt
 
@@ -54,17 +60,24 @@ jobs:
   verify-on-windows:
     runs-on: windows-latest
     needs: build-sums
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_TAG: ${{ env.RELEASE_TAG }}
     steps:
       - name: Checkout (tag del release) con LFS
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ env.RELEASE_TAG }}
           lfs: true
+
+      - name: Descargar SHA256SUMS.txt del release
+        shell: pwsh
+        run: |
+          gh release download $env:RELEASE_TAG -p SHA256SUMS.txt -D out
+          Get-ChildItem out
 
       - name: Verificar checksums con tu script
         shell: pwsh
         run: |
-          if (-not (Test-Path .\verify_release.ps1)) {
-            Write-Error "Falta verify_release.ps1"; exit 1
-          }
-          .\verify_release.ps1
+          if (-not (Test-Path .\verify_release.ps1)) { Write-Error "Falta verify_release.ps1"; exit 1 }
+          .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
