@@ -14,9 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    defaults:
-      run:
-        working-directory: HR-StepA
     steps:
       - id: settag
         name: Compute tag
@@ -59,7 +56,7 @@ jobs:
       - name: Subir SHA256SUMS.txt al release
         uses: softprops/action-gh-release@v2
         with:
-          files: HR-StepA/out/SHA256SUMS.txt
+          files: out/SHA256SUMS.txt
           tag_name: ${{ steps.settag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,19 +64,16 @@ jobs:
   verify-on-windows:
     runs-on: windows-latest
     needs: build-sums
-    defaults:
-      run:
-        working-directory: HR-StepA
     steps:
       - id: settag
-        name: Compute tag
-        shell: bash
+        name: Compute tag (pwsh)
+        shell: pwsh
         run: |
-          if [ -n "${{ github.event.release.tag_name }}" ]; then
-            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
-          fi
+          if ("${{ github.event.release.tag_name }}") {
+            "tag=${{ github.event.release.tag_name }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } else {
+            "tag=${{ github.event.inputs.tag }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
 
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
@@ -91,6 +85,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
+          New-Item -ItemType Directory -Force out | Out-Null
           gh release download $tag -p SHA256SUMS.txt -D out
           Get-ChildItem out
         env:
@@ -99,4 +94,3 @@ jobs:
       - name: Verificar checksums con tu script
         shell: pwsh
         run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
-
