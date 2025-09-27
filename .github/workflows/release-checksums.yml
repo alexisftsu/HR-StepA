@@ -1,4 +1,4 @@
-name: release-checksums
+﻿name: release-checksums
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag (e.g., HR-StepA-PartB-beta0.08-Delta1100)"
+        description: "Release tag to verify (e.g., HR-StepA-PartB-beta0.08-Delta1100)"
         required: true
 
 jobs:
@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    defaults:
+      run:
+        working-directory: HR-StepA
     steps:
       - id: settag
         name: Compute tag
@@ -21,43 +24,52 @@ jobs:
           if [ -n "${{ github.event.release.tag_name }}" ]; then
             echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Download release assets
+      - name: Checkout (tag) con LFS
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.settag.outputs.tag }}
+          lfs: true
+
+      - name: Instalar jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Verificar y generar checksums si hay assets
+        run: |
+          set -e
+          # Intentar descargar assets, continuar si no hay
+          if gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D . 2>/dev/null; then
+            echo "Assets downloaded, generating checksums..."
+            test -f out/BEST_manifest.json || { echo "No existe out/BEST_manifest.json"; exit 1; }
+            ASSETS_FROM_MANIFEST=$(jq -r '.assets.best_zip, .assets.inputs_zip, .assets.lemma_pdf' out/BEST_manifest.json)
+            EXTRAS="out/BEST_summary.txt"
+            CSV_GLOB="out/summary_sweep_beta*.csv"
+            : > out/SHA256SUMS.txt
+            for f in ${ASSETS_FROM_MANIFEST} ${EXTRAS}; do
+              if [ -f "$f" ]; then
+                sha256sum "$f" >> out/SHA256SUMS.txt
+              else
+                echo "WARN: falta $f" >&2
+              fi
+            done
+            for f in $CSV_GLOB; do
+              [ -f "$f" ] && sha256sum "$f" >> out/SHA256SUMS.txt || true
+            done
+            cat out/SHA256SUMS.txt
+          else
+            echo "No assets found in this release, skipping checksum generation"
+            exit 0
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          mkdir -p dl
-          if ! gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D out 2>/dev/null; then echo "No assets found in this release, skipping checksum generation"; exit 0; fing "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D dl
-          ls -la dl
 
-      - name: Generate SHA256SUMS.txt (selected assets)
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          files=()
-          for pat in \
-            "HR_Final_pkg_FINAL_BEST_*.zip" \
-            "HR_Final_inputs_*.zip" \
-            "*lemma*.pdf" \
-            "BEST_summary.txt" \
-            "summary_sweep_*.csv"
-          do
-            for f in dl/$pat; do files+=("$f"); done
-          done
-
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No matching assets found in dl/"; ls -la dl; exit 1
-          fi
-
-          ( cd dl && sha256sum "${files[@]#dl/}" > SHA256SUMS.txt && cat SHA256SUMS.txt )
-
-      - name: Upload SHA256SUMS.txt to release
+      - name: Subir SHA256SUMS.txt al release
+        if: success()
         uses: softprops/action-gh-release@v2
         with:
-          files: dl/SHA256SUMS.txt
+          files: HR-StepA/out/SHA256SUMS.txt
           tag_name: ${{ steps.settag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,43 +77,36 @@ jobs:
   verify-on-windows:
     runs-on: windows-latest
     needs: build-sums
+    if: success()
+    defaults:
+      run:
+        working-directory: HR-StepA
     steps:
       - id: settag
-        name: Compute tag (pwsh)
-        shell: pwsh
+        name: Compute tag
+        shell: bash
         run: |
-          if ("${{ github.event.release.tag_name }}") {
-            "tag=${{ github.event.release.tag_name }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          } else {
-            "tag=${{ github.event.inputs.tag }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          }
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Download assets (including SHA256SUMS.txt)
+      - name: Checkout (tag) con LFS
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.settag.outputs.tag }}
+          lfs: true
+
+      - name: Descargar SHA256SUMS.txt del release
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
-          New-Item -ItemType Directory -Force dl | Out-Null
-          if ! gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" -D out 2>/dev/null; then echo "No assets found in this release, skipping checksum generation"; exit 0; fing $tag --repo "${{ github.repository }}" -D dl
-          Get-ChildItem dl | Sort-Object Name | Format-Table Name, Length
+          gh release download $tag -p SHA256SUMS.txt -D out --repo "${{ github.repository }}"
+          Get-ChildItem out
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Verify checksums with Get-FileHash
+      - name: Verificar checksums con tu script
         shell: pwsh
-        run: |
-          $sumsPath = ".\dl\SHA256SUMS.txt"
-          if (!(Test-Path $sumsPath)) { throw "Missing $sumsPath" }
-          $ok = $true
-          foreach ($line in Get-Content $sumsPath) {
-            if ($line -match '^([0-9A-Fa-f]{64})\s+\*?(.+)$') {
-              $expected = $matches[1].ToLower()
-              $file = Join-Path ".\dl" $matches[2]
-              if (!(Test-Path $file)) { Write-Host "MISSING $file"; $ok = $false; continue }
-              $actual = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLower()
-              if ($actual -ne $expected) { Write-Host "MISMATCH $file"; $ok = $false } else { Write-Host "OK $file" }
-            }
-          }
-          if (-not $ok) { throw "Checksum verification failed" }
-
-
-
+        run: .\verify_release.ps1 -SumsPath .\out\SHA256SUMS.txt
