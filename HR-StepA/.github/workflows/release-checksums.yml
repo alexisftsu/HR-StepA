@@ -17,14 +17,11 @@ jobs:
     defaults:
       run:
         working-directory: HR-StepA
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
     steps:
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
           lfs: true
 
       - name: Instalar jq
@@ -54,32 +51,31 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: HR-StepA/out/SHA256SUMS.txt
+          tag_name: ${{ github.event.release.tag_name || inputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   verify-on-windows:
     runs-on: windows-latest
     needs: build-sums
-    permissions:
-      contents: read
     defaults:
       run:
         working-directory: HR-StepA
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
     steps:
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
           lfs: true
 
       - name: Descargar SHA256SUMS.txt del release
         shell: pwsh
         run: |
-          gh release download $env:RELEASE_TAG -p SHA256SUMS.txt -D out
+          $tag = "${{ github.event.release.tag_name || inputs.tag }}"
+          gh release download $tag -p SHA256SUMS.txt -D out
           Get-ChildItem out
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verificar checksums con tu script
         shell: pwsh
