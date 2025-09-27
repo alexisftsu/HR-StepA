@@ -18,10 +18,19 @@ jobs:
       run:
         working-directory: HR-StepA
     steps:
+      - id: settag
+        name: Compute tag
+        run: |
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          ref: ${{ steps.settag.outputs.tag }}
           lfs: true
 
       - name: Instalar jq
@@ -51,7 +60,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: HR-StepA/out/SHA256SUMS.txt
-          tag_name: ${{ github.event.release.tag_name || inputs.tag }}
+          tag_name: ${{ steps.settag.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,16 +71,26 @@ jobs:
       run:
         working-directory: HR-StepA
     steps:
+      - id: settag
+        name: Compute tag
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          ref: ${{ steps.settag.outputs.tag }}
           lfs: true
 
       - name: Descargar SHA256SUMS.txt del release
         shell: pwsh
         run: |
-          $tag = "${{ github.event.release.tag_name || inputs.tag }}"
+          $tag = "${{ steps.settag.outputs.tag }}"
           gh release download $tag -p SHA256SUMS.txt -D out
           Get-ChildItem out
         env:
