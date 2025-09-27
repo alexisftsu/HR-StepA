@@ -21,3 +21,19 @@ results/HR_v1.zip
 # SO
 .DS_Store
 Thumbs.db
+# artifacts / bundles
+*.pdf
+*.zip
+
+# checksums / logs / lists
+SHA256SUMS.txt
+md5*.txt
+bad_*.txt
+present_files.txt
+prepare_err.txt
+
+# datasets/resultados pesados
+zeros_files_summary_*.json
+
+# otros generados locales
+Files.zip
