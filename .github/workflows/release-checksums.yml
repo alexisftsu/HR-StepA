@@ -46,7 +46,13 @@ jobs:
       - name: Instalar jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Generar SHA256SUMS.txt
+      - name: Validar manifest (campos requeridos)
+        if: ${{ steps.detect.outputs.count != '0' }}
+        working-directory: HR-StepA
+        run: |
+          jq -e '.assets.best_zip and .assets.inputs_zip and .assets.lemma_pdf' BEST_manifest.json >/dev/null \
+            || { echo "Manifest incompleto"; exit 1; }
+
         if: ${{ steps.detect.outputs.count != '0' }}
         working-directory: HR-StepA
         env:
@@ -157,6 +163,7 @@ jobs:
             if ($got -ne $expected) { Write-Host "MISMATCH $file"; $errors++ } else { Write-Host "OK $file" }
           }
           if ($errors -gt 0) { Write-Error "Hubo $errors errores de checksum"; exit 1 }; exit 0
+
 
 
 
