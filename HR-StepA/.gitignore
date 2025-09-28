@@ -26,3 +26,8 @@ HR-StepA/out/
 HR-StepA/BEST_manifest.json
 HR-StepA/BEST_summary.txt
 HR-StepA/out/
+# HR-StepA: archivos locales que NO queremos versionar
+HR-StepA/BEST_manifest.json
+HR-StepA/BEST_summary.txt
+HR-StepA/summary_sweep_beta*.csv
+HR-StepA/out/
