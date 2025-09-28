@@ -41,3 +41,8 @@ Files.zip
 *.zip
 *.pdf
 HR-StepA/out/*.zip
+# HR-StepA local artifacts (no versionar)
+HR-StepA/BEST_manifest.json
+HR-StepA/BEST_summary.txt
+HR-StepA/summary_sweep_beta*.csv
+HR-StepA/out/

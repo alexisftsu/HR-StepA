@@ -12,8 +12,7 @@ on:
 jobs:
   build-sums:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    permissions: { contents: write }
     outputs:
       should_verify: ${{ steps.mark.outputs.should_verify }}
     steps:
@@ -28,8 +27,7 @@ jobs:
 
       - id: detect
         name: Detect release assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
         run: |
           set -e
           TAG="${{ steps.settag.outputs.tag }}"
@@ -50,47 +48,28 @@ jobs:
         if: ${{ steps.detect.outputs.count != '0' }}
         working-directory: HR-StepA
         run: |
+          test -f BEST_manifest.json || { echo "No existe BEST_manifest.json"; exit 1; }
           jq -e '.assets.best_zip and .assets.inputs_zip and .assets.lemma_pdf' BEST_manifest.json >/dev/null \
             || { echo "Manifest incompleto"; exit 1; }
 
+      - name: Generar SHA256SUMS.txt
         if: ${{ steps.detect.outputs.count != '0' }}
         working-directory: HR-StepA
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
         run: |
           set -e
-          # Descarga todos los assets del release al directorio actual (HR-StepA)
           gh release download "${{ steps.settag.outputs.tag }}" --repo "${{ github.repository }}" --skip-existing -D .
           ls -la . || true
-
-          # Manifest en raíz
           test -f BEST_manifest.json || { echo "No existe BEST_manifest.json"; exit 1; }
-
-          # Rutas desde el manifest (pueden venir con prefijo out/)
           ASSETS_FROM_MANIFEST=$(jq -r '.assets.best_zip, .assets.inputs_zip, .assets.lemma_pdf' BEST_manifest.json)
-
-          # Extras en raíz
           EXTRAS="BEST_summary.txt"
           CSV_GLOB="summary_sweep_beta*.csv"
-
-          # Salida en raíz
           : > SHA256SUMS.txt
-
-          # Hashear assets del manifest (pelando 'out/' si aparece)
           for f in ${ASSETS_FROM_MANIFEST} ${EXTRAS}; do
             f2=${f#out/}
-            if [ -f "$f2" ]; then
-              sha256sum "$f2" >> SHA256SUMS.txt
-            else
-              echo "WARN: falta $f2" >&2
-            fi
+            if [ -f "$f2" ]; then sha256sum "$f2" >> SHA256SUMS.txt; else echo "WARN: falta $f2" >&2; fi
           done
-
-          # Hashear CSV opcionales
-          for f in $CSV_GLOB; do
-            [ -f "$f" ] && sha256sum "$f" >> SHA256SUMS.txt || true
-          done
-
+          for f in $CSV_GLOB; do [ -f "$f" ] && sha256sum "$f" >> SHA256SUMS.txt || true; done
           cat SHA256SUMS.txt
 
       - id: mark
@@ -103,8 +82,7 @@ jobs:
         with:
           files: HR-StepA/SHA256SUMS.txt
           tag_name: ${{ steps.settag.outputs.tag }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: { GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
 
   verify-on-windows:
     runs-on: windows-latest
@@ -130,8 +108,7 @@ jobs:
       - name: Descargar SHA256SUMS.txt del release
         working-directory: HR-StepA
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
           gh release download $tag --repo "${{ github.repository }}" --skip-existing -p SHA256SUMS.txt -D .
@@ -140,30 +117,21 @@ jobs:
       - name: Verificar checksums (PowerShell)
         working-directory: HR-StepA
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
         run: |
           $tag = "${{ steps.settag.outputs.tag }}"
-          # Asegura que los archivos a verificar estén presentes en HR-StepA\
           gh release download $tag --repo "${{ github.repository }}" --skip-existing -D .
           $sumsPath = Join-Path (Get-Location) 'SHA256SUMS.txt'
           if (!(Test-Path $sumsPath)) { Write-Error "No se encontró $sumsPath"; exit 1 }
-
           $lines  = Get-Content $sumsPath | Where-Object { $_ -match '\S' }
           $errors = 0
           foreach ($line in $lines) {
-            # Formato: "<hash><2+ espacios><archivo>"
             $parts = $line -split '\s{2,}', 2
-            if ($parts.Count -lt 2) { Write-Host "Saltando línea: $line"; continue }
+            if ($parts.Count -lt 2) { continue }
             $expected = $parts[0].ToLower()
             $file     = $parts[1]
-
             if (!(Test-Path $file)) { Write-Host "MISSING  $file"; $errors++; continue }
             $got = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLower()
             if ($got -ne $expected) { Write-Host "MISMATCH $file"; $errors++ } else { Write-Host "OK $file" }
           }
           if ($errors -gt 0) { Write-Error "Hubo $errors errores de checksum"; exit 1 }; exit 0
-
-
-
-
