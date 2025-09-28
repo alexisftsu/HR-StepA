@@ -23,3 +23,6 @@ out/HR_Final_pkg_*.zip
 .DS_Store
 Thumbs.db
 HR-StepA/out/
+HR-StepA/BEST_manifest.json
+HR-StepA/BEST_summary.txt
+HR-StepA/out/
