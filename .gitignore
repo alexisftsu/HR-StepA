@@ -37,3 +37,7 @@ zeros_files_summary_*.json
 
 # otros generados locales
 Files.zip
+# binaries & artifacts
+*.zip
+*.pdf
+HR-StepA/out/*.zip
