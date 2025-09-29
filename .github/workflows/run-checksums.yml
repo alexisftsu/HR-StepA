@@ -8,8 +8,15 @@ on:
         required: true
         type: string
 
+# Permisos a nivel de workflow (opcional pero claro)
+permissions:
+  contents: write
+
 jobs:
   call-release-checksums3:
     uses: ./.github/workflows/release-checksums3.yml
     with:
       tag: ${{ inputs.tag }}
+    secrets: inherit
+    permissions:
+      contents: write
