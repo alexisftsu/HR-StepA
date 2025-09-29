@@ -8,6 +8,8 @@ on:
       tag:
         description: "Release tag to verify (e.g., HR-StepA-PartB-beta0.08-Delta1100)"
         required: true
+  repository_dispatch:
+    types: [checksums]
 
 jobs:
   build-sums:
@@ -21,8 +23,10 @@ jobs:
         run: |
           if [ -n "${{ github.event.release.tag_name }}" ]; then
             echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
-          else
+          elif [ -n "${{ github.event.inputs.tag }}" ]; then
             echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ github.event.client_payload.tag }}" >> "$GITHUB_OUTPUT"
           fi
       - id: detect
         name: Detect release assets
@@ -88,8 +92,10 @@ jobs:
         run: |
           if ("${{ github.event.release.tag_name }}") {
             "tag=${{ github.event.release.tag_name }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          } else {
+          } elseif ("${{ github.event.inputs.tag }}") {
             "tag=${{ github.event.inputs.tag }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } else {
+            "tag=${{ github.event.client_payload.tag }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           }
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
