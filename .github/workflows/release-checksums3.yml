@@ -1,4 +1,4 @@
-﻿name: release-checksums3
+name: release-checksums3
 
 on:
   release:
@@ -24,7 +24,6 @@ jobs:
           else
             echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
           fi
-
       - id: detect
         name: Detect release assets
         env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
@@ -34,16 +33,13 @@ jobs:
           CNT=$(gh release view "$TAG" --repo "${{ github.repository }}" --json assets --jq '.assets | length')
           echo "count=$CNT" >> "$GITHUB_OUTPUT"
           echo "Assets count: $CNT"
-
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.settag.outputs.tag }}
           lfs: true
-
       - name: Instalar jq
         run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Validar manifest (campos requeridos)
         if: ${{ steps.detect.outputs.count != '0' }}
         working-directory: HR-StepA
@@ -51,7 +47,6 @@ jobs:
           test -f BEST_manifest.json || { echo "No existe BEST_manifest.json"; exit 1; }
           jq -e '.assets.best_zip and .assets.inputs_zip and .assets.lemma_pdf' BEST_manifest.json >/dev/null \
             || { echo "Manifest incompleto"; exit 1; }
-
       - name: Generar SHA256SUMS.txt
         if: ${{ steps.detect.outputs.count != '0' }}
         working-directory: HR-StepA
@@ -71,11 +66,9 @@ jobs:
           done
           for f in $CSV_GLOB; do [ -f "$f" ] && sha256sum "$f" >> SHA256SUMS.txt || true; done
           cat SHA256SUMS.txt
-
       - id: mark
         if: ${{ steps.detect.outputs.count != '0' }}
         run: echo "should_verify=true" >> "$GITHUB_OUTPUT"
-
       - name: Subir SHA256SUMS.txt al release
         if: ${{ steps.detect.outputs.count != '0' }}
         uses: softprops/action-gh-release@v2
@@ -98,13 +91,11 @@ jobs:
           } else {
             "tag=${{ github.event.inputs.tag }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           }
-
       - name: Checkout (tag) con LFS
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.settag.outputs.tag }}
           lfs: true
-
       - name: Descargar SHA256SUMS.txt del release
         working-directory: HR-StepA
         shell: pwsh
@@ -113,7 +104,6 @@ jobs:
           $tag = "${{ steps.settag.outputs.tag }}"
           gh release download $tag --repo "${{ github.repository }}" --skip-existing -p SHA256SUMS.txt -D .
           Get-ChildItem .
-
       - name: Verificar checksums (PowerShell)
         working-directory: HR-StepA
         shell: pwsh
