@@ -8,11 +8,15 @@ on:
         required: true
         type: string
 
-# Permisos a nivel de workflow (opcional pero claro)
 permissions:
   contents: write
 
 jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "wrapper alive: ${{ github.run_id }}"
+
   call-release-checksums3:
     uses: ./.github/workflows/release-checksums3.yml
     with:
